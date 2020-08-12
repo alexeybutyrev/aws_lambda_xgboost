@@ -37,7 +37,7 @@ echo "Pip installing packages using local compilation for numpy and scipy..." > 
 /usr/bin/pip-${PYTHON_VER} install --upgrade pip==9.0.3 setuptools
 /usr/bin/pip-${PYTHON_VER} install --no-binary numpy numpy==${NUMPY_VER}
 /usr/bin/pip-${PYTHON_VER} install --no-binary scipy scipy==${SCIPY_VER}
-/usr/bin/pip-${PYTHON_VER} install --target $SITE_PACKAGES_DIR xgboost 
+/usr/bin/pip-${PYTHON_VER} install --target $SITE_PACKAGES_DIR xgboost==0.90 
 /usr/bin/pip-${PYTHON_VER} install --target $SITE_PACKAGES_DIR joblib
 echo "Pip installing packages using local compilation for numpy and scipy...done" > /dev/null 2>&1
 
