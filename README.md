@@ -7,6 +7,8 @@ We all know with AWS Lambda *50Mb* limit on zip upload and *~262Mb* limit from A
 
 # Notes - to be updated 
 
+Warning: currently unzipped package size is ~370mb, I need to remove some unrequired files from the package to let it run on lambda...
+
 - The final size is of the file in the zip is about 254M which leaves you about 8M for extra files and packages
 - In most cases it's imposible to zip your models into the rest of 8Mb in the zip file (262 - 254) so here there a solotion with boto3 library how to load models from s3 buckets
 - The model load call should be before lambda_function that's how it would be loaded once and not going to waste time in calls
