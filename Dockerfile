@@ -89,6 +89,8 @@ RUN echo "Copying ${SITE_PACKAGES_DIR} contents to ${LAMBDA_PACKAGE_DIR}...done"
 RUN echo "Copying compiled libraries to ${LIB_DIR}..." > /dev/null 2>&1
 RUN cp /usr/lib64/atlas/libsatlas.so.3 ${LIB_DIR}
 RUN cp /usr/lib64/atlas/libtatlas.so.3 ${LIB_DIR}
+RUN cp /usr/lib64/libblas.so.3 ${LIB_DIR}
+RUN cp /usr/lib64/liblapack.so.3 ${LIB_DIR}
 RUN cp /usr/lib64/libquadmath.so.0 ${LIB_DIR}
 RUN cp /usr/lib64/libgfortran.so.4 ${LIB_DIR}
 RUN cp /usr/lib64/libgomp.so.1 ${LIB_DIR}
@@ -131,11 +133,10 @@ RUN rm -rf ${LAMBDA_PACKAGE_DIR}/*.dist-info
 RUN rm -rf ${LAMBDA_PACKAGE_DIR}/xgboost/dmlc-core
 RUN rm -rf ${LAMBDA_PACKAGE_DIR}/xgboost/rabit/
 RUN rm -rf ${LAMBDA_PACKAGE_DIR}/xgboost/make/
-RUN rm -rf ${LAMBDA_PACKAGE_DIR}/numpy/f2py
 RUN rm -rf ${LAMBDA_PACKAGE_DIR}/pyximport
 
-RUN rm -rf ${LAMBDA_PACKAGE_DIR}/Cython
-RUN rm -rf ${LAMBDA_PACKAGE_DIR}/cython*
+# RUN rm -rf ${LAMBDA_PACKAGE_DIR}/Cython
+# RUN rm -rf ${LAMBDA_PACKAGE_DIR}/cython*
 
 RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy.libs
 RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/fftpack
