@@ -5,12 +5,10 @@ AWS Lambda Deployment Xgboost package Python 3.8
 
 We all know with AWS Lambda *50Mb* limit on zip upload and *~262Mb* limit from AWS s3 unzipped total size. This script allows you to make a package that will have xgboost library with all the dependencies and joblib.
 
-# Notes - to be updated 
+# Notes
 
-Warning: currently unzipped package size is ~370mb, I need to remove some unrequired files from the package to let it run on lambda...
-
-- The final size is of the file in the zip is about 254M which leaves you about 8M for extra files and packages
-- In most cases it's imposible to zip your models into the rest of 8Mb in the zip file (262 - 254) so here there a solotion with boto3 library how to load models from s3 buckets
+- The final size is of the file in the zip is about 225M which leaves you about 37M for extra files and packages
+- In most cases it's imposible to zip your models into the rest of 37Mb in the zip file (262 - 225) so here there a solotion with boto3 library how to load models from s3 buckets
 - The model load call should be before lambda_function that's how it would be loaded once and not going to waste time in calls
 - In the code it's suggested to load model into local AWS Lambda /tmp/ directory. That directory is limited to 500Mb 
 

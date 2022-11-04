@@ -52,7 +52,8 @@ RUN yum -y install \
 RUN echo "Yum installing non-pip packages...done" > /dev/null 2>&1
 
 ENV NUMPY_VER='1.19.5'
-ENV SCIPY_VER='1.9.3'
+# ENV SCIPY_VER='0.19.1'
+ENV SCIPY_VER='1.5.4'
 
 RUN echo "Pip installing packages using local compilation for numpy and scipy..." > /dev/null 2>&1
 RUN /usr/bin/python${PYTHON_VER} -m pip install --upgrade Cython==0.29.32 pip==22.3 setuptools==53.1.0
@@ -62,8 +63,8 @@ RUN /usr/bin/python${PYTHON_VER} -m pip install numpy==${NUMPY_VER}
 RUN /usr/bin/python${PYTHON_VER} -m pip install scipy scipy==${SCIPY_VER}
 RUN /usr/bin/python${PYTHON_VER} -m pip install --target ${SITE_PACKAGES_DIR} xgboost==0.90
 # RUN /usr/bin/python${PYTHON_VER} -m pip install xgboost==0.90
-RUN /usr/bin/python${PYTHON_VER} -m pip install --target ${SITE_PACKAGES_DIR} joblib
-# RUN /usr/bin/python${PYTHON_VER} -m pip install joblib
+
+# RUN /usr/bin/python${PYTHON_VER} -m pip install --target ${SITE_PACKAGES_DIR} joblib
 RUN echo "Pip installing packages using local compilation for numpy and scipy...done" > /dev/null 2>&1
 
 RUN echo "Verfifying installation..." > /dev/null 2>&1
@@ -72,7 +73,7 @@ RUN /usr/bin/python${PYTHON_VER} -c "import numpy as np; print(np.version.versio
 RUN /usr/bin/python${PYTHON_VER} -c "import numpy as np; print(np.__config__.show())"
 RUN /usr/bin/python${PYTHON_VER} -c "import scipy as sp; print(sp.version.version)"
 RUN /usr/bin/python${PYTHON_VER} -c "import xgboost; print(xgboost.__version__)"
-RUN /usr/bin/python${PYTHON_VER} -c "import joblib; print(joblib.__version__)"
+# RUN /usr/bin/python${PYTHON_VER} -c "import joblib; print(joblib.__version__)"
 
 RUN echo "Verfifying installation...done" > /dev/null 2>&1
 
@@ -86,9 +87,11 @@ RUN cp -rf ${SITE_PACKAGES_DIR}/* ${LAMBDA_PACKAGE_DIR}
 RUN echo "Copying ${SITE_PACKAGES_DIR} contents to ${LAMBDA_PACKAGE_DIR}...done" > /dev/null 2>&1
 
 RUN echo "Copying compiled libraries to ${LIB_DIR}..." > /dev/null 2>&1
-RUN cp /usr/lib64/atlas/* ${LIB_DIR}
+RUN cp /usr/lib64/atlas/libsatlas.so.3 ${LIB_DIR}
+RUN cp /usr/lib64/atlas/libtatlas.so.3 ${LIB_DIR}
 RUN cp /usr/lib64/libquadmath.so.0 ${LIB_DIR}
 RUN cp /usr/lib64/libgfortran.so.4 ${LIB_DIR}
+RUN cp /usr/lib64/libgomp.so.1 ${LIB_DIR}
 RUN echo "Copying compiled libraries to ${LIB_DIR}...done" > /dev/null 2>&1
 
 RUN echo "Reducing package size..." > /dev/null 2>&1
@@ -102,6 +105,48 @@ RUN rm -rf ${LAMBDA_PACKAGE_DIR}/*.dist-info
 RUN find ${LAMBDA_PACKAGE_DIR} -name tests | xargs rm -rf
 # strip excess from compiled .so files
 RUN find ${LAMBDA_PACKAGE_DIR} -name "*.so" | xargs strip
+
+# use -strip-unneeded due "ELF load command address/offset not properly aligned" error
+# RUN find ${LAMBDA_PACKAGE_DIR} -name "*.so" -not -path "${LAMBDA_PACKAGE_DIR}*scipy*/*"  | xargs strip --strip-unneeded
+
+# remove source folders
+RUN find ${LAMBDA_PACKAGE_DIR} -name src | xargs rm -rf
+# remove doc folders
+RUN find ${LAMBDA_PACKAGE_DIR} -name doc | xargs rm -rf
+# remove test folders
+RUN find ${LAMBDA_PACKAGE_DIR} -type d -name "[Tt]est*" | xargs rm -rf
+# remove pycache and pyc files
+RUN find ${LAMBDA_PACKAGE_DIR} -type d -a -name '__pycache__' -print0 | xargs -0 rm -rf
+RUN find ${LAMBDA_PACKAGE_DIR} -type f -a -name '*.pyc' -print0 | xargs -0 rm -f
+# try to remove this too
+RUN rm -rdf ${LAMBDA_PACKAGE_DIR}/bin/
+
+RUN find ${LAMBDA_PACKAGE_DIR} -name '*.txt' -delete
+RUN find ${LAMBDA_PACKAGE_DIR} -name '*.md' -delete
+
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/*.egg-info
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/*.dist-info
+
+# works if we remove following:
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/xgboost/dmlc-core
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/xgboost/rabit/
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/xgboost/make/
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/numpy/f2py
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/pyximport
+
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/Cython
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/cython*
+
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy.libs
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/fftpack
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/integrate
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/interpolate
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/signal
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/spatial
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/special
+RUN rm -rf ${LAMBDA_PACKAGE_DIR}/scipy/stats
+
+
 RUN echo "Final unzipped package size: $(du -sh ${LAMBDA_PACKAGE_DIR} | cut -f1)" > /dev/null 2>&1
 RUN echo "Reducing package size...done" > /dev/null 2>&1
 
