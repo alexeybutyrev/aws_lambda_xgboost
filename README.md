@@ -1,5 +1,5 @@
 # aws_lambda_xgboost
-AWS Lambda Deployment Xgboost package Python 3.6
+AWS Lambda Deployment Xgboost package Python 3.8
 
 # Description
 
@@ -7,8 +7,8 @@ We all know with AWS Lambda *50Mb* limit on zip upload and *~262Mb* limit from A
 
 # Notes
 
-- The final size is of the file in the zip is about 254M which leaves you about 8M for extra files and packages
-- In most cases it's imposible to zip your models into the rest of 8Mb in the zip file (262 - 254) so here there a solotion with boto3 library how to load models from s3 buckets
+- The final size is of the file in the zip is about 250M which leaves you about 12M for extra files and packages
+- In most cases it's imposible to zip your models into the rest of 12Mb in the zip file (262 - 250) so here there a solotion with boto3 library how to load models from s3 buckets
 - The model load call should be before lambda_function that's how it would be loaded once and not going to waste time in calls
 - In the code it's suggested to load model into local AWS Lambda /tmp/ directory. That directory is limited to 500Mb 
 
@@ -19,7 +19,7 @@ We all know with AWS Lambda *50Mb* limit on zip upload and *~262Mb* limit from A
 2. Run this command from the repo folder
 
 ```{bash}
-docker run -v $(pwd):/outputs -it amazonlinux:2016.09 /bin/bash /outputs/build.sh
+sh build.sh
 ```
 
 3. There will be generated folder __lambda-package__ and the zip file __lambda-package.zip__
@@ -42,7 +42,4 @@ docker run -v $(pwd):/outputs -it amazonlinux:2016.09 /bin/bash /outputs/build.s
 
 # Credits
 
-[Ryan Brown](https://github.com/ryansb) for providing original packaging sklearn and numpy [example](https://github.com/ryansb/sklearn-build-lambda)
-Here it was used [modified version](https://github.com/ryansb/sklearn-build-lambda/pull/16/commits/75c713d23107300370b16b134936b959f1f0f73b) to Python 3.6 from [Mark Campanelli](https://github.com/markcampanelli)
-
-[Jing Xie](https://www.linkedin.com/in/jing-xie-4a307012/) and [Ken Mcdonnell](https://www.linkedin.com/in/ken-mcdonnell-b438b237/) for helping with deploying models and debugging.
+[Alexey Butyrev](https://github.com/alexeybutyrev) for providing original xgb packaging in [origin repo](https://github.com/alexeybutyrev/aws_lambda_xgboost)
